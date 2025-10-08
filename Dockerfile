@@ -1,47 +1,32 @@
-# Build argument to specify Node.js version (used for image tag)
+# Build argument to specify Node.js version
 ARG NODE_VERSION=22
 
-# Use the official Pulumi Node.js image with specified Node version
-# The pulumi/pulumi-nodejs image provides different tags for different Node versions
+# Use official Pulumi Node.js base image
 FROM pulumi/pulumi-nodejs-${NODE_VERSION}
 
-# Install additional dependencies
-# Switch to root temporarily for system-level installations
-USER root
+# Create a non-root user (avoid root completely)
+USER 1001
+WORKDIR /home/pulumi
 
-# Install system packages including AWS CLI and other tools
-RUN apt-get update && apt-get install -y \
-    curl \
-    unzip \
-    git \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Copy AWS CLI binary instead of installing via apt-get (no root needed)
+RUN mkdir -p /tmp/aws && \
+    curl -sSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws/awscliv2.zip" && \
+    unzip /tmp/aws/awscliv2.zip -d /tmp/aws && \
+    ./tmp/aws/aws/install --bin-dir /home/pulumi/.local/bin --install-dir /home/pulumi/.aws-cli && \
+    rm -rf /tmp/aws
 
-# Install AWS CLI v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-    && unzip awscliv2.zip \
-    && ./aws/install \
-    && rm -rf awscliv2.zip aws
+# Add Pulumi plugins (runs as non-root)
+RUN pulumi plugin install resource aws && \
+    pulumi plugin install resource command
 
-# Install commonly used Pulumi plugins
-# These are the plugins typically pre-installed in the official image
-RUN pulumi plugin install resource aws \
-    && pulumi plugin install resource command
+# Ensure local bin is in PATH
+ENV PATH="/home/pulumi/.local/bin:${PATH}"
 
-# Install global npm packages if needed
-# RUN npm install -g typescript @types/node
+# Set working directory for project
+WORKDIR /home/pulumi/projects
 
-# Switch back to the pulumi user
-USER pulumi
-
-# Set working directory
-WORKDIR /pulumi/projects
-
-# Copy your Pulumi project files (uncomment as needed)
-# COPY --chown=pulumi:pulumi . .
-
-# Install project dependencies (uncomment if you have package.json)
-# RUN npm install
+# Drop privileges explicitly (just to be clear)
+USER 1001
 
 # Default command
 CMD ["pulumi", "version"]
