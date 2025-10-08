@@ -9,7 +9,9 @@ USER 1001
 WORKDIR /home/pulumi
 
 # Copy AWS CLI binary instead of installing via apt-get (no root needed)
-RUN case "$(uname -m)" in \
+RUN mkdir -p /tmp/aws && \
+    chmod -R 777 /tmp/aws && \
+    case "$(uname -m)" in \
       x86_64) ARCH="x86_64";; \
       aarch64) ARCH="aarch64";; \
     esac && \
@@ -17,7 +19,6 @@ RUN case "$(uname -m)" in \
     unzip /tmp/aws/awscliv2.zip -d /tmp/aws && \
     /tmp/aws/aws/install --bin-dir /home/pulumi/.local/bin --install-dir /home/pulumi/.aws-cli --update && \
     rm -rf /tmp/aws
-
 
 # Add Pulumi plugins (runs as non-root)
 RUN pulumi plugin install resource aws && \
