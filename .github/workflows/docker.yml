@@ -2,8 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    tags:
-      - 'v*.*.*' # optional: build on tags like v1.0.0
+    branches: ['main']
+    # tags:
+    #   - 'v*.*.*' # optional: build on tags like v1.0.0
 
 jobs:
   build:
@@ -26,11 +27,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract latest tag
-        id: vars
-        run: |
-          TAG=$(git describe --tags --abbrev=0)
-          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
+      # - name: Extract latest tag
+      #   id: vars
+      #   run: |
+      #     TAG=$(git describe --tags --abbrev=0)
+      #     echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
 
       - name: Build and push (multi-arch)
         uses: docker/build-push-action@v6
@@ -41,5 +42,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/pulumi-node-aws:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pulumi-node-aws:${{ steps.vars.outputs.VERSION }}
+            # ${{ secrets.DOCKERHUB_USERNAME }}/pulumi-node-aws:${{ steps.vars.outputs.VERSION }}
 
