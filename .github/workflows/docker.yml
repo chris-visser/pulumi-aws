@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: ['main']
-    # tags:
-    #   - 'v*.*.*' # optional: build on tags like v1.0.0
+    # branches: ['main']
+    tags:
+      - 'v*.*.*' # optional: build on tags like v1.0.0
 
 jobs:
   build:
