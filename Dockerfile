@@ -21,8 +21,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Install commonly used Pulumi plugins
 # These are the plugins typically pre-installed in the official image
-RUN pulumi plugin install resource aws v6.66.1 
-    && pulumi plugin install resource command
+RUN pulumi plugin install resource aws v6.66.1 \
+     pulumi plugin install resource command
 
 # Install global npm packages if needed
 # RUN npm install -g typescript @types/node
