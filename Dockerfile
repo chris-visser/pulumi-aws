@@ -27,9 +27,6 @@ RUN pulumi plugin install resource aws \
 # Install global npm packages if needed
 # RUN npm install -g typescript @types/node
 
-# Switch back to the pulumi user
-USER pulumi
-
 # Set working directory
 WORKDIR /pulumi/projects
 
