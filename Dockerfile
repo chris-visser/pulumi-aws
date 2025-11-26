@@ -1,5 +1,5 @@
 # Build argument to specify Node.js version (used for image tag)
-ARG NODE_VERSION=22
+ARG NODE_VERSION=24
 
 # Use the official Pulumi Node.js image with specified Node version
 # The pulumi/pulumi-nodejs image provides different tags for different Node versions
@@ -23,6 +23,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 # These are the plugins typically pre-installed in the official image
 RUN pulumi plugin install resource aws v6.66.1
 RUN pulumi plugin install resource command v1.0.1
+RUN pulumi plugin install resource synced-folder v0.12.4
 
 # Install global npm packages if needed
 # RUN npm install -g typescript @types/node
